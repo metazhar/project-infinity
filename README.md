@@ -14,3 +14,9 @@
   - What actors are involved? Is there a keeper? What is the admin tasked with?
   - What are the known risks/issues?
   - Any pertinent formulas used.
+
+# Dependencies & Setup
+
+forge install smartcontractkit/chainlink-brownie-contracts@0.6.1 --no-commit
+forge install OpenZeppelin/openzeppelin-contracts --no-commit
+forge remappings > remappings.txt
