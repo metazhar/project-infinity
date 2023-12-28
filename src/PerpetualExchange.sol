@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.18;
+pragma solidity 0.8.20;
 
 // import {ERC4626} from "openzeppelin-contracts/contracts/token/ERC20/extensions/ERC4626.sol";
 
@@ -51,7 +51,8 @@ pragma solidity 0.8.18;
 
 /* is ERC4626 */ contract PerpetualExchange {
     // Errors
-    error DepositLessThanMinimumDepositAmount();
+    error depositLessThanMinimumDepositAmount();
+    error withdrawGreaterThanBalance();
 
     // Constants
     uint256 constant MINIMUM_DEPOSIT_AMOUNT = 100000000000000000; // 0.1 ETH
@@ -71,22 +72,31 @@ pragma solidity 0.8.18;
     function depositLiquidity(uint256 amount) external payable {
         // Perform Validations
         if (amount < MINIMUM_DEPOSIT_AMOUNT) {
-            revert DepositLessThanMinimumDepositAmount();
+            revert depositLessThanMinimumDepositAmount();
         }
         // Deposit Liquidity into Vault -
         //  For now, just store it in the contract and update a mapping
         liquidityDeposits[msg.sender] += amount;
+        // Send Liquidity to Vault
+        // payable(address(this)).transfer(amount);
         // Mint Tokens to represent LP's share of the Vault
         // mint(msg.sender, amount); // ERC-4626
     }
 
     // LP - Withdraw Liquidity
-    function withdrawLiquidity() external {
+    function withdrawLiquidity(uint256 amount) external {
         // Perform Validations
+        if (amount > liquidityDeposits[msg.sender]) {
+            revert withdrawGreaterThanBalance();
+        }
         // Burn Tokens representing LP's share of the Vault
         // Withdraw Liquidity from Vault -
         //   For now, send from contract and update a mapping
-        // Return Liquidity to LP
+        liquidityDeposits[msg.sender] -= amount;
+        // Burn Tokens
+        // burn(msg.sender, amount); // ERC-4626
+        // Transfer Liquidity back to LP
+        //payable(msg.sender).transfer(amount);
     }
 
     // Traders
